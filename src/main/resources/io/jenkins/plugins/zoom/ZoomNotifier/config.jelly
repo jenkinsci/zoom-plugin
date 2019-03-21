@@ -1,0 +1,49 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
+    <f:entry title="Webhook URL" help="/plugin/zoom-notification/help/webhook.html">
+        <f:textbox field="webhookUrl" />
+    </f:entry>
+    <f:entry title="Token" help="/plugin/zoom-notification/help/token.html">
+        <f:textbox field="authToken" />
+    </f:entry>
+
+    <f:validateButton
+        title="${%Test Connection}" progress="${%Testing...}"
+        method="testConnection" with="webhookUrl,authToken"/>
+
+    <f:advanced>
+        <f:entry field="notifyStart" title="Notify Build Start" help="/plugin/zoom-notification/help/notify-start.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+        <f:entry field="notifySuccess" title="Notify Success" help="/plugin/zoom-notification/help/notify-success.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+        <f:entry field="notifyUnstable" title="Notify Unstable" help="/plugin/zoom-notification/help/notify-unstable.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+        <f:entry field="notifyFailure" title="Notify Failure" help="/plugin/zoom-notification/help/notify-failure.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+        <f:entry field="notifyNotBuilt" title="Notify Not Built" help="/plugin/zoom-notification/help/notify-not-build.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+        <f:entry field="notifyAborted" title="Notify Aborted" help="/plugin/zoom-notification/help/notify-aborted.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+        <f:entry field="notifyBackToNormal" title="Notify Back To Normal" help="/plugin/zoom-notification/help/notify-back-to-normal.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+        <f:entry field="notifyRepeatedFailure" title="Notify Repeated Failure" help="/plugin/zoom-notification/help/notify-repeated-failure.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+        <f:entry field="includeCommitInfo" title="Include Commit Info" help="/plugin/zoom-notification/help/include-commit-info.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+        <f:entry field="includeTestSummary" title="Include Test Summary" help="/plugin/zoom-notification/help/include-test-summary.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+        <f:entry field="includeFailedTests" title="Include Failed Tests" help="/plugin/zoom-notification/help/include-failed-tests.html">
+            <f:checkbox checked="true" />
+        </f:entry>
+    </f:advanced>
+</j:jelly>
