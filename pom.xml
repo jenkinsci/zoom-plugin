@@ -8,11 +8,11 @@
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>zoom-notification</artifactId>
+    <artifactId>zoom</artifactId>
     <version>1.0</version>
     <packaging>hpi</packaging>
     <name>Zoom Plugin</name>
-    <description>Zoom notification plugin</description>
+    <description>Send build notification to Zoom channel</description>
 
     <url>https://wiki.jenkins.io/display/JENKINS/Zoom+Notification+Plugin</url>
 
@@ -28,11 +28,10 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git://github.com/jenkinsci/zoom-notification.git</connection>
-        <developerConnection>scm:git:git://github.com/jenkinsci/zoom-notification.git</developerConnection>
-        <url>https://github.com/jenkinsci/zoom-notification.git</url>
+        <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     </scm>
-
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
