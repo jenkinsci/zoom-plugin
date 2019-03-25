@@ -16,6 +16,7 @@ public class BuildReport {
     private String fullUrl;
     private long duration;
     private String status;
+    private String summary;
     private String cause;
     private Set<Change> changes = new HashSet<>();
     @JsonProperty("test_summary")

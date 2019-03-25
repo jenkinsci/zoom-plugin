@@ -1,6 +1,7 @@
 package io.jenkins.plugins.zoom;
 
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.*;
@@ -9,17 +10,22 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
+import jenkins.model.Jenkins;
+import jenkins.tasks.SimpleBuildStep;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 
 @Data
 @Slf4j
-public class ZoomNotifier extends Notifier{
+public class ZoomNotifier extends Notifier implements SimpleBuildStep {
 
     @DataBoundSetter
     private String webhookUrl;
@@ -49,16 +55,6 @@ public class ZoomNotifier extends Notifier{
     private boolean includeTestSummary;
     @DataBoundSetter
     private boolean includeFailedTests;
-    public static final String START_STATUS_MESSAGE = "Start",
-            BACK_TO_NORMAL_STATUS_MESSAGE = "Back to normal",
-            STILL_FAILING_STATUS_MESSAGE = "Still Failing",
-            SUCCESS_STATUS_MESSAGE = "Success",
-            FAILURE_STATUS_MESSAGE = "Failure",
-            ABORTED_STATUS_MESSAGE = "Aborted",
-            NOT_BUILT_STATUS_MESSAGE = "Not built",
-            UNSTABLE_STATUS_MESSAGE = "Unstable",
-            REGRESSION_STATUS_MESSAGE = "Regression",
-            UNKNOWN_STATUS_MESSAGE = "Unknown";
 
     @DataBoundConstructor
     public ZoomNotifier() {
@@ -72,25 +68,24 @@ public class ZoomNotifier extends Notifier{
 
     @Override
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener){
-        log.info("Prebuild: " + build.getProject().getFullDisplayName());
+        log.info("Prebuild: {}", build.getProject().getFullDisplayName());
         listener.getLogger().println("---------------------- Prebuild ----------------------");
         if(notifyStart){
             MessageBuilder messageBuilder = new MessageBuilder(this, build, listener);
-            ZoomNotifyClient.notify(this.webhookUrl, this.authToken, messageBuilder.prebuild(isIncludeCommitInfo()));
+            ZoomNotifyClient.notify(this.webhookUrl, this.authToken, messageBuilder.prebuild());
         }
         return super.prebuild(build, listener);
     }
 
+
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        log.info("Perform: " + build.getProject().getFullDisplayName());
-        listener.getLogger().println("---------------------- Perform ----------------------");
-        String status = getStatusMessage(build);
-        if(notifyPerform(status)){
-            MessageBuilder messageBuilder = new MessageBuilder(this, build, listener);
-            ZoomNotifyClient.notify(this.webhookUrl, this.authToken, messageBuilder.build(status, isIncludeTestSummary(), isIncludeFailedTests()));
+    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath filePath, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
+        log.info("Perform: {}", run.getFullDisplayName());
+        taskListener.getLogger().println("---------------------- Perform ----------------------");
+        if(notifyPerform(run)){
+            MessageBuilder messageBuilder = new MessageBuilder(this, run, taskListener);
+            ZoomNotifyClient.notify(this.webhookUrl, this.authToken, messageBuilder.build());
         }
-        return true;
     }
 
     @Override
@@ -103,79 +98,36 @@ public class ZoomNotifier extends Notifier{
         return true;
     }
 
-    private boolean notifyPerform(String status){
-        if ((ABORTED_STATUS_MESSAGE.equals(status) && this.isNotifyAborted())
-                ||(NOT_BUILT_STATUS_MESSAGE.equals(status) && this.isNotifyNotBuilt())
-                ||(UNSTABLE_STATUS_MESSAGE.equals(status) && this.isNotifyUnstable())
-                ||(STILL_FAILING_STATUS_MESSAGE.equals(status) && this.isNotifyRepeatedFailure())
-                ||(FAILURE_STATUS_MESSAGE.equals(status) && this.isNotifyFailure())
-                ||(SUCCESS_STATUS_MESSAGE.equals(status) && this.isNotifySuccess())
-                ||(BACK_TO_NORMAL_STATUS_MESSAGE.equals(status))){
-            return true;
+    private boolean notifyPerform(Run run){
+        if(run.isBuilding()){
+            return false;
         }
-        return false;
+        ResultTrend trend = ResultTrend.getResultTrend(run);
+        switch(trend) {
+            case ABORTED:
+                return this.isNotifyAborted();
+            case NOT_BUILT:
+                return this.isNotifyNotBuilt();
+            case FAILURE:
+                return this.isNotifyFailure();
+            case STILL_FAILING:
+                return this.isNotifyRepeatedFailure();
+            case NOW_UNSTABLE:
+                return this.isNotifyUnstable();
+            case STILL_UNSTABLE:
+                return this.isNotifyUnstable();
+            case UNSTABLE:
+                return this.isNotifyUnstable();
+            case SUCCESS:
+                return this.isNotifySuccess();
+            case FIXED:
+                return this.isNotifySuccess()||this.isNotifyBackToNormal();
+            default:
+                return false;
+        }
     }
 
-    public String getStatusMessage(AbstractBuild build){
-        Result result = build.getResult();
-        if (null != result){
-            if (result == Result.ABORTED) {
-                return ABORTED_STATUS_MESSAGE;
-            }
-            if (result == Result.NOT_BUILT) {
-                return NOT_BUILT_STATUS_MESSAGE;
-            }
-            if (result == Result.UNSTABLE) {
-                return UNSTABLE_STATUS_MESSAGE;
-            }
-            AbstractBuild lastBuild = build.getProject().getLastBuild();
-            if (null != lastBuild) {
-                Result previousResult;
-                Run previousBuild = lastBuild.getPreviousBuild();
-                Run previousSuccessfulBuild = build.getPreviousSuccessfulBuild();
-                boolean buildHasSucceededBefore = previousSuccessfulBuild != null;
-
-                /*
-                 * If the last build was aborted, go back to find the last non-aborted build.
-                 * This is so that aborted builds do not affect build transitions.
-                 * I.e. if build 1 was failure, build 2 was aborted and build 3 was a success the transition
-                 * should be failure -> success (and therefore back to normal) not aborted -> success.
-                 */
-                Run lastNonAbortedBuild = previousBuild;
-                while (lastNonAbortedBuild != null && lastNonAbortedBuild.getResult() == Result.ABORTED) {
-                    lastNonAbortedBuild = lastNonAbortedBuild.getPreviousBuild();
-                }
-
-
-                /* If all previous builds have been aborted, then use
-                 * SUCCESS as a default status so an aborted message is sent
-                 */
-                if (lastNonAbortedBuild == null) {
-                    previousResult = Result.SUCCESS;
-                } else {
-                    previousResult = lastNonAbortedBuild.getResult();
-                }
-
-                if (result == Result.SUCCESS
-                        && (previousResult == Result.FAILURE || previousResult == Result.UNSTABLE)
-                        && buildHasSucceededBefore && this.isNotifyBackToNormal()) {
-                    return BACK_TO_NORMAL_STATUS_MESSAGE;
-                }
-                if (result == Result.FAILURE && previousResult == Result.FAILURE) {
-                    return STILL_FAILING_STATUS_MESSAGE;
-                }
-            }
-            if (result == Result.SUCCESS) {
-                return SUCCESS_STATUS_MESSAGE;
-            }
-            if (result == Result.FAILURE) {
-                return FAILURE_STATUS_MESSAGE;
-            }
-        }
-        return UNKNOWN_STATUS_MESSAGE;
-    }
-
-
+    @Symbol("zoomNotifier")
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher>{
 
@@ -189,8 +141,10 @@ public class ZoomNotifier extends Notifier{
             return "Zoom Build Notifier";
         }
 
+        @POST
         public FormValidation doTestConnection(@QueryParameter("webhookUrl") final String webhookUrl,
                                                @QueryParameter("authToken") final String authToken){
+            Jenkins.get().checkPermission(Jenkins.READ);
             if(ZoomNotifyClient.notify(webhookUrl, authToken, null)){
                 return FormValidation.ok("Connection is ok");
             }

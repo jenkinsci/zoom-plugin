@@ -3,6 +3,7 @@ package io.jenkins.plugins.zoom;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.model.*;
+import hudson.model.Messages;
 import hudson.scm.ChangeLogSet;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
@@ -21,29 +22,31 @@ public class MessageBuilder {
 
     private static final Pattern aTag = Pattern.compile("(?i)<a([^>]+)>(.+?)</a>|(\\{)");
     private static final Pattern href = Pattern.compile("\\s*(?i)href\\s*=\\s*(\"([^\"]*\")|'[^']*'|([^'\">\\s]+))");
-
+    public static final String STATUS_MESSAGE_START = "Start";
+    public static final String STATUS_MESSAGE_SUCCESS = "Success";
+    public static final String STATUS_MESSAGE_FAILURE = "Failure";
 
     private ZoomNotifier notifier;
-    private AbstractBuild build;
-    private BuildListener listener;
+    private Run run;
+    private TaskListener listener;
     private BuildReport report;
 
-    public MessageBuilder(ZoomNotifier notifier, AbstractBuild build, BuildListener listener) {
+    public MessageBuilder(ZoomNotifier notifier, Run Run, TaskListener listener) {
         this.notifier = notifier;
-        this.build = build;
+        this.run = Run;
         this.listener = listener;
         this.report = new BuildReport();
     }
 
-    public String prebuild(boolean includeCommitInfo){
+    public String prebuild(){
         appendFullDisplayName();
         appendDisplayName();
         appendOpenLink();
         appendCause();
-        if(includeCommitInfo){
+        if(notifier.isIncludeCommitInfo()){
             appendChanges();
         }
-        appendStatus(ZoomNotifier.START_STATUS_MESSAGE);
+        appendStatus(STATUS_MESSAGE_START);
         try {
             return new ObjectMapper().writeValueAsString(report);
         } catch (JsonProcessingException e) {
@@ -53,17 +56,18 @@ public class MessageBuilder {
         return null;
     }
 
-    public String build(String status, boolean includeTestSummary, boolean includeFailedTests){
+    public String build(){
         appendFullDisplayName();
         appendDisplayName();
         appendOpenLink();
         appendCause();
         appendDuration();
-        appendStatus(status);
-        if(includeTestSummary){
+        appendStatus(getBuildResult());
+        appendBuildSummary();
+        if(notifier.isIncludeTestSummary()){
             appendTestSummary();
         }
-        if(includeFailedTests){
+        if(notifier.isIncludeFailedTests()){
             appendFailedTests();
         }
         try {
@@ -76,44 +80,69 @@ public class MessageBuilder {
     }
 
     private void appendFullDisplayName(){
-        report.setName(this.escape(build.getProject().getFullDisplayName()));
+        report.setName(this.escape(run.getFullDisplayName()));
     }
 
     private void appendDisplayName(){
-        report.setNumber(this.escape(build.getDisplayName()));
+        report.setNumber(this.escape(run.getDisplayName()));
     }
 
     private void appendOpenLink(){
-        String url = DisplayURLProvider.get().getRunURL(build);
+        String url = DisplayURLProvider.get().getRunURL(run);
         report.setFullUrl(this.escape(url));
     }
 
+
+    private void appendStatus(String status){
+        report.setStatus(status);
+    }
+
+    private String getBuildResult(){
+        ResultTrend trend = ResultTrend.getResultTrend(this.run);
+        if(trend == ResultTrend.SUCCESS || trend == ResultTrend.FIXED){
+            return STATUS_MESSAGE_SUCCESS;
+        }else{
+            return STATUS_MESSAGE_FAILURE;
+        }
+    }
+
+    private void appendBuildSummary(){
+        if(Messages.Run_Summary_BackToNormal().equals(run.getBuildStatusSummary().message) && !this.notifier.isNotifyBackToNormal()){
+            report.setSummary(this.escape(Messages.Run_Summary_Stable()));
+        } else {
+            report.setSummary(this.escape(run.getBuildStatusSummary().message));
+        }
+    }
+
     private void appendCause(){
-        CauseAction causeAction = build.getAction(CauseAction.class);
+        CauseAction causeAction = run.getAction(CauseAction.class);
         if (causeAction != null){
             report.setCause(this.escape(causeAction.getCauses().get(0).getShortDescription()));
         }
     }
 
     private void appendDuration(){
-        report.setDuration(build.getDuration());
+        report.setDuration(run.getDuration());
     }
 
     private void appendChanges(){
-        ChangeLogSet changeSet = build.getChangeSet();
-        if (!build.hasChangeSetComputed() || changeSet == null || changeSet.getItems().length == 0){
-            listener.getLogger().println("No commit changes");
-            log.info("No commit changes");
-            return;
-        }
-        for (Object o : changeSet.getItems()){
-            ChangeLogSet.Entry entry = (ChangeLogSet.Entry) o;
-            report.addChange(entry);
+        if(this.run instanceof AbstractBuild){
+            AbstractBuild build = (AbstractBuild) run;
+            ChangeLogSet changeSet = build.getChangeSet();
+            if (!build.hasChangeSetComputed() || changeSet == null || changeSet.getItems().length == 0){
+                listener.getLogger().println("No commit changes");
+                log.info("No commit changes");
+                return;
+            }
+            for (Object o : changeSet.getItems()){
+                ChangeLogSet.Entry entry = (ChangeLogSet.Entry) o;
+                report.addChange(entry);
+            }
         }
     }
 
     private void appendTestSummary(){
-        AbstractTestResultAction<?> action = this.build
+        AbstractTestResultAction<?> action = this.run
                 .getAction(AbstractTestResultAction.class);
         if (action != null) {
             report.setTotalTest(action.getTotalCount());
@@ -126,7 +155,7 @@ public class MessageBuilder {
     }
 
     private void appendFailedTests(){
-        AbstractTestResultAction<?> action = this.build
+        AbstractTestResultAction<?> action = this.run
                 .getAction(AbstractTestResultAction.class);
         if (action != null && action.getFailCount() > 0) {
             for(TestResult result : action.getFailedTests()){
@@ -136,10 +165,6 @@ public class MessageBuilder {
             listener.getLogger().println("No failed tests");
             log.info("No failed tests");
         }
-    }
-
-    private void appendStatus(String status){
-        report.setStatus(this.escape(status));
     }
 
 
