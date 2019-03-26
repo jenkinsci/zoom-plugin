@@ -3,8 +3,8 @@ package io.jenkins.plugins.zoom;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.Util;
 import hudson.model.*;
+import hudson.security.Permission;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
@@ -144,7 +144,7 @@ public class ZoomNotifier extends Notifier implements SimpleBuildStep {
         @POST
         public FormValidation doTestConnection(@QueryParameter("webhookUrl") final String webhookUrl,
                                                @QueryParameter("authToken") final String authToken){
-            Jenkins.get().checkPermission(Jenkins.READ);
+            Jenkins.get().checkPermission(Permission.CONFIGURE);
             if(ZoomNotifyClient.notify(webhookUrl, authToken, null)){
                 return FormValidation.ok("Connection is ok");
             }
