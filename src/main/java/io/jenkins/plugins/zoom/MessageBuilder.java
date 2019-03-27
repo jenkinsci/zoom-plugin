@@ -126,6 +126,7 @@ public class MessageBuilder {
     }
 
     private void appendChanges(){
+        report.initChanges();
         if(this.run instanceof AbstractBuild){
             AbstractBuild build = (AbstractBuild) run;
             ChangeLogSet changeSet = build.getChangeSet();
@@ -142,6 +143,7 @@ public class MessageBuilder {
     }
 
     private void appendTestSummary(){
+        report.initTestSummary();
         AbstractTestResultAction<?> action = this.run
                 .getAction(AbstractTestResultAction.class);
         if (action != null) {
@@ -155,6 +157,7 @@ public class MessageBuilder {
     }
 
     private void appendFailedTests(){
+        report.getTestSummary().initFailedResults();
         AbstractTestResultAction<?> action = this.run
                 .getAction(AbstractTestResultAction.class);
         if (action != null && action.getFailCount() > 0) {

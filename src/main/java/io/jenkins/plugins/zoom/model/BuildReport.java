@@ -18,7 +18,7 @@ public class BuildReport {
     private String status;
     private String summary;
     private String cause;
-    private Set<Change> changes = new HashSet<>();
+    private Set<Change> changes;
     @JsonProperty("test_summary")
     private TestSummary testSummary = new TestSummary();
 
@@ -31,6 +31,16 @@ public class BuildReport {
             c.addAffectedFile(file);
         }
         changes.add(c);
+    }
+
+    public void initChanges(){
+        changes = new HashSet<>();
+    }
+
+    public void initTestSummary(){
+        this.testSummary.setTotal(0);
+        this.testSummary.setFail(0);
+        this.testSummary.setSkip(0);
     }
 
     public void setTotalTest(int count){
@@ -66,10 +76,14 @@ public class BuildReport {
 
     @Data
     public static class TestSummary {
-        private int total;
-        private int fail;
-        private int skip;
-        private Set<TestResult> failedResults = new HashSet<>();
+        private Integer total;
+        private Integer fail;
+        private Integer skip;
+        private Set<TestResult> failedResults;
+
+        public void initFailedResults(){
+            failedResults = new HashSet<>();
+        }
 
         public void addFailedTestResults(hudson.tasks.test.TestResult result){
             TestResult r = new TestResult();
