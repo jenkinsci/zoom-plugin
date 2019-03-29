@@ -10,6 +10,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import java.io.IOException;
+
 @Slf4j
 public class ZoomNotifyClient{
 
@@ -43,7 +45,7 @@ public class ZoomNotifyClient{
             if(responseCode == HttpStatus.SC_OK){
                 success = true;
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error("Error posting to Zoom, url: {}, authToken: {}, message: {}", url, authToken, message);
         } finally {
             httpPost.releaseConnection();
