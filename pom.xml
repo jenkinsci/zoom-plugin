@@ -14,10 +14,10 @@
     <name>Zoom Plugin</name>
     <description>Send build notification to Zoom channel</description>
 
-    <url>https://wiki.jenkins.io/display/JENKINS/Zoom+Notification+Plugin</url>
+    <url>https://wiki.jenkins.io/display/JENKINS/Zoom+Plugin</url>
 
     <properties>
-        <jenkins.version>2.164.1</jenkins.version>
+        <jenkins.version>2.107.1</jenkins.version>
         <java.level>8</java.level>
     </properties>
 
