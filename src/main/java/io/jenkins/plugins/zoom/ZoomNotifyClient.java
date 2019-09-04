@@ -20,7 +20,7 @@ public class ZoomNotifyClient{
 
     public static boolean notify(String url, String authToken, String message) {
         boolean success = false;
-        log.info("Send notification to {}, authToken: {}, message: {}", url, authToken, message);
+        log.info("Send notification to {}, message: {}", url, message);
         if(url == null || url.isEmpty()){
             log.error("Invalid URL: {}", url);
             return success;
@@ -50,7 +50,7 @@ public class ZoomNotifyClient{
         } catch (IllegalArgumentException e1){
             log.error("Invalid URL: {}", url);
         } catch (IOException e2) {
-            log.error("Error posting to Zoom, url: {}, authToken: {}, message: {}", url, authToken, message);
+            log.error("Error posting to Zoom, url: {}, message: {}", url, message);
         } finally {
             if(httpPost != null){
                 httpPost.releaseConnection();
