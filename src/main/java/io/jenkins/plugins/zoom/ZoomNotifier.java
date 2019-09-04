@@ -80,6 +80,8 @@ public class ZoomNotifier extends Notifier {
         if(notifyPerform(build)){
             MessageBuilder messageBuilder = new MessageBuilder(this, build, listener);
             ZoomNotifyClient.notify(this.webhookUrl, this.authToken, messageBuilder.build());
+        } else {
+          taskListener.getLogger().println("------------------- Unknown Result ------------------");
         }
         return true;
     }
@@ -95,31 +97,32 @@ public class ZoomNotifier extends Notifier {
     }
 
     private boolean notifyPerform(Run run){
-        if(run.isBuilding()){
-            return false;
-        }
-        ResultTrend trend = ResultTrend.getResultTrend(run);
-        switch(trend) {
-            case ABORTED:
-                return this.isNotifyAborted();
-            case NOT_BUILT:
-                return this.isNotifyNotBuilt();
-            case FAILURE:
-                return this.isNotifyFailure();
-            case STILL_FAILING:
-                return this.isNotifyRepeatedFailure();
-            case NOW_UNSTABLE:
-                return this.isNotifyUnstable();
-            case STILL_UNSTABLE:
-                return this.isNotifyUnstable();
-            case UNSTABLE:
-                return this.isNotifyUnstable();
-            case SUCCESS:
-                return this.isNotifySuccess();
-            case FIXED:
-                return this.isNotifySuccess()||this.isNotifyBackToNormal();
-            default:
-                return false;
+        try {
+            ResultTrend trend = ResultTrend.getResultTrend(run);
+            switch(trend) {
+                case ABORTED:
+                    return this.isNotifyAborted();
+                case NOT_BUILT:
+                    return this.isNotifyNotBuilt();
+                case FAILURE:
+                    return this.isNotifyFailure();
+                case STILL_FAILING:
+                    return this.isNotifyRepeatedFailure();
+                case NOW_UNSTABLE:
+                    return this.isNotifyUnstable();
+                case STILL_UNSTABLE:
+                    return this.isNotifyUnstable();
+                case UNSTABLE:
+                    return this.isNotifyUnstable();
+                case SUCCESS:
+                    return this.isNotifySuccess();
+                case FIXED:
+                    return this.isNotifySuccess()||this.isNotifyBackToNormal();
+                default:
+                    return false;
+            }
+        } catch (final IllegalArgumentException e) {
+          return false;
         }
     }
 
