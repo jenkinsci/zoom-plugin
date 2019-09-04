@@ -9,7 +9,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>zoom</artifactId>
-    <version>${pluginversion}${snapshot}</version>
+    <version>1.2</version>
     <packaging>hpi</packaging>
     <name>Zoom Plugin</name>
     <description>Send build notification to Zoom channel</description>
@@ -33,7 +33,7 @@
         <connection>scm:git:git://github.com/jenkinsci/zoom-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/zoom-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/zoom-plugin</url>
-        <tag>${scmTag}</tag>
+        <tag>zoom-1.2p</tag>
     </scm>
     <repositories>
         <repository>
