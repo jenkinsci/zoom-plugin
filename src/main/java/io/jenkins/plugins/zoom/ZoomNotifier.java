@@ -1,7 +1,6 @@
 package io.jenkins.plugins.zoom;
 
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.*;
 import hudson.security.Permission;
@@ -11,7 +10,6 @@ import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
-import jenkins.tasks.SimpleBuildStep;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jenkinsci.Symbol;
@@ -20,12 +18,9 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
-import javax.annotation.Nonnull;
-import java.io.IOException;
-
 @Data
 @Slf4j
-public class ZoomNotifier extends Notifier implements SimpleBuildStep {
+public class ZoomNotifier extends Notifier {
 
     @DataBoundSetter
     private String webhookUrl;
@@ -79,13 +74,14 @@ public class ZoomNotifier extends Notifier implements SimpleBuildStep {
 
 
     @Override
-    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath filePath, @Nonnull Launcher launcher, @Nonnull TaskListener taskListener) throws InterruptedException, IOException {
-        log.info("Perform: {}", run.getFullDisplayName());
-        taskListener.getLogger().println("---------------------- Perform ----------------------");
-        if(notifyPerform(run)){
-            MessageBuilder messageBuilder = new MessageBuilder(this, run, taskListener);
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) {
+        log.info("Perform: {}", build.getProject().getFullDisplayName());
+        listener.getLogger().println("---------------------- Perform ----------------------");
+        if(notifyPerform(build)){
+            MessageBuilder messageBuilder = new MessageBuilder(this, build, listener);
             ZoomNotifyClient.notify(this.webhookUrl, this.authToken, messageBuilder.build());
         }
+        return true;
     }
 
     @Override
@@ -133,7 +129,7 @@ public class ZoomNotifier extends Notifier implements SimpleBuildStep {
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
-            return FreeStyleProject.class.isAssignableFrom(aClass);
+            return true;
         }
 
         @Override

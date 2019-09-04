@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
+    <f:entry title="Webhook URL" help="/plugin/zoom/webhook.html">
+        <f:textbox field="webhookUrl" />
+    </f:entry>
+    <f:entry title="Token" help="/plugin/zoom/token.html">
+        <f:textbox field="authToken" />
+    </f:entry>
+    <f:entry title="Message">
+        <f:textbox field="message" />
+    </f:entry>
+
+    <f:validateButton
+        title="${%Test Connection}" progress="${%Testing...}"
+        method="testConnection" with="webhookUrl,authToken"/>
+
+
+</j:jelly>

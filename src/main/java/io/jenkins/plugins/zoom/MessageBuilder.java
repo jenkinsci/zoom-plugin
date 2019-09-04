@@ -25,6 +25,7 @@ public class MessageBuilder {
     public static final String STATUS_MESSAGE_START = "Start";
     public static final String STATUS_MESSAGE_SUCCESS = "Success";
     public static final String STATUS_MESSAGE_FAILURE = "Failure";
+    public static final String STATUS_MESSAGE_WORKFLOW = "Workflow";
 
     private ZoomNotifier notifier;
     private Run run;
@@ -38,7 +39,23 @@ public class MessageBuilder {
         this.report = new BuildReport();
     }
 
+    public String buildPipeMsg(String message){
+        appendStatus(STATUS_MESSAGE_WORKFLOW);
+        appendFullDisplayName();
+        appendDisplayName();
+        appendOpenLink();
+        report.setSummary(message);
+        try {
+            return new ObjectMapper().writeValueAsString(report);
+        } catch (JsonProcessingException e) {
+            log.error("Error build json process", e);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public String prebuild(){
+        appendStatus(STATUS_MESSAGE_START);
         appendFullDisplayName();
         appendDisplayName();
         appendOpenLink();
@@ -46,7 +63,6 @@ public class MessageBuilder {
         if(notifier.isIncludeCommitInfo()){
             appendChanges();
         }
-        appendStatus(STATUS_MESSAGE_START);
         try {
             return new ObjectMapper().writeValueAsString(report);
         } catch (JsonProcessingException e) {

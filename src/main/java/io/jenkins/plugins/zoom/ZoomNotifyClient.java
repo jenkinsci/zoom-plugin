@@ -11,6 +11,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 @Slf4j
 public class ZoomNotifyClient{
@@ -21,11 +22,12 @@ public class ZoomNotifyClient{
         boolean success = false;
         log.info("Send notification to {}, authToken: {}, message: {}", url, authToken, message);
         if(url == null || url.isEmpty()){
-            log.error("Invalid URL");
+            log.error("Invalid URL: {}", url);
             return success;
         }
-        HttpPost httpPost = new HttpPost(url);
+        HttpPost httpPost = null;
         try {
+            httpPost = new HttpPost(url);
             httpPost.setHeader("content-type", "application/json;charset=UTF-8");
             if(authToken != null && !authToken.isEmpty()){
                 httpPost.setHeader("Authorization", authToken);
@@ -45,11 +47,16 @@ public class ZoomNotifyClient{
             if(responseCode == HttpStatus.SC_OK){
                 success = true;
             }
-        } catch (IOException e) {
+        } catch (IllegalArgumentException e1){
+            log.error("Invalid URL: {}", url);
+        } catch (IOException e2) {
             log.error("Error posting to Zoom, url: {}, authToken: {}, message: {}", url, authToken, message);
         } finally {
-            httpPost.releaseConnection();
+            if(httpPost != null){
+                httpPost.releaseConnection();
+            }
         }
+        log.info("Notify success? {}", success);
         return success;
     }
 }
