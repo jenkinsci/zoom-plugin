@@ -7,13 +7,16 @@
     <f:entry title="Token" help="/plugin/zoom/token.html">
         <f:textbox field="authToken" />
     </f:entry>
+    <f:entry field="jenkinsProxyUsed" title="Use Jenkins proxy settings" help="/plugin/zoom/jenkinsProxy.html">
+        <f:checkbox default="true" />
+    </f:entry>
     <f:entry title="Message">
         <f:textbox field="message" />
     </f:entry>
 
     <f:validateButton
         title="${%Test Connection}" progress="${%Testing...}"
-        method="testConnection" with="webhookUrl,authToken"/>
+        method="testConnection" with="webhookUrl,authToken,jenkinsProxyUsed"/>
 
 
 </j:jelly>

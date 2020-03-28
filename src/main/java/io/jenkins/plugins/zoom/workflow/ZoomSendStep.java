@@ -28,6 +28,8 @@ public class ZoomSendStep extends Step {
     @DataBoundSetter
     private String authToken;
     @DataBoundSetter
+    private boolean jenkinsProxyUsed;
+    @DataBoundSetter
     private String message;
 
     @DataBoundConstructor
@@ -58,7 +60,7 @@ public class ZoomSendStep extends Step {
             TaskListener listener = getContext().get(TaskListener.class);
             MessageBuilder messageBuilder = new MessageBuilder(null, run, listener);
             String msg = messageBuilder.buildPipeMsg(this.step.getMessage());
-            ZoomNotifyClient.notify(this.step.getWebhookUrl(), this.step.getAuthToken(), msg);
+            ZoomNotifyClient.notify(this.step.getWebhookUrl(), this.step.getAuthToken(), this.step.isJenkinsProxyUsed(), msg);
             return null;
         }
     }
@@ -83,9 +85,10 @@ public class ZoomSendStep extends Step {
 
         @POST
         public FormValidation doTestConnection(@QueryParameter("webhookUrl") final String webhookUrl,
-                                               @QueryParameter("authToken") final String authToken){
+                                               @QueryParameter("authToken") final String authToken,
+                                               @QueryParameter("jenkinsProxyUsed") final boolean jenkinsProxyUsed){
             Jenkins.get().checkPermission(Permission.CONFIGURE);
-            if(ZoomNotifyClient.notify(webhookUrl, authToken, null)){
+            if(ZoomNotifyClient.notify(webhookUrl, authToken, jenkinsProxyUsed, null)){
                 return FormValidation.ok("Connection is ok");
             }
             return FormValidation.error("Connect failed");
