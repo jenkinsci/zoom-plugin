@@ -27,6 +27,8 @@ public class ZoomNotifier extends Notifier {
     @DataBoundSetter
     private String authToken;
     @DataBoundSetter
+    private boolean jenkinsProxyUsed;
+    @DataBoundSetter
     private boolean notifyStart;
     @DataBoundSetter
     private boolean notifySuccess;
@@ -67,7 +69,7 @@ public class ZoomNotifier extends Notifier {
         listener.getLogger().println("---------------------- Prebuild ----------------------");
         if(notifyStart){
             MessageBuilder messageBuilder = new MessageBuilder(this, build, listener);
-            ZoomNotifyClient.notify(this.webhookUrl, this.authToken, messageBuilder.prebuild());
+            ZoomNotifyClient.notify(this.webhookUrl, this.authToken, this.jenkinsProxyUsed, messageBuilder.prebuild());
         }
         return super.prebuild(build, listener);
     }
@@ -79,7 +81,7 @@ public class ZoomNotifier extends Notifier {
         listener.getLogger().println("---------------------- Perform ----------------------");
         if(notifyPerform(build)){
             MessageBuilder messageBuilder = new MessageBuilder(this, build, listener);
-            ZoomNotifyClient.notify(this.webhookUrl, this.authToken, messageBuilder.build());
+            ZoomNotifyClient.notify(this.webhookUrl, this.authToken, this.jenkinsProxyUsed, messageBuilder.build());
         }
         return true;
     }
@@ -139,9 +141,10 @@ public class ZoomNotifier extends Notifier {
 
         @POST
         public FormValidation doTestConnection(@QueryParameter("webhookUrl") final String webhookUrl,
-                                               @QueryParameter("authToken") final String authToken){
+                                               @QueryParameter("authToken") final String authToken,
+                                               @QueryParameter("jenkinsProxyUsed") final boolean jenkinsProxyUsed){
             Jenkins.get().checkPermission(Permission.CONFIGURE);
-            if(ZoomNotifyClient.notify(webhookUrl, authToken, null)){
+            if(ZoomNotifyClient.notify(webhookUrl, authToken, jenkinsProxyUsed, null)){
                 return FormValidation.ok("Connection is ok");
             }
             return FormValidation.error("Connect failed");

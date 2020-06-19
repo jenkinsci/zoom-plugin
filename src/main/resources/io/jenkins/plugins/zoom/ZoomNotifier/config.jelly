@@ -6,10 +6,13 @@
     <f:entry title="Token" help="/plugin/zoom/token.html">
         <f:textbox field="authToken" />
     </f:entry>
+    <f:entry field="jenkinsProxyUsed" title="Use Jenkins proxy settings" help="/plugin/zoom/jenkinsProxy.html">
+        <f:checkbox default="true" />
+    </f:entry>
 
     <f:validateButton
         title="${%Test Connection}" progress="${%Testing...}"
-        method="testConnection" with="webhookUrl,authToken"/>
+        method="testConnection" with="webhookUrl,authToken,jenkinsProxyUsed"/>
 
     <f:advanced>
         <f:entry field="notifyStart" title="Notify Build Start" help="/plugin/zoom/notify-start.html">
