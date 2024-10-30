@@ -9,6 +9,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
+import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class ZoomNotifier extends Notifier {
     @DataBoundSetter
     private String webhookUrl;
     @DataBoundSetter
-    private String authToken;
+    private Secret authToken;
     @DataBoundSetter
     private boolean jenkinsProxyUsed;
     @DataBoundSetter
