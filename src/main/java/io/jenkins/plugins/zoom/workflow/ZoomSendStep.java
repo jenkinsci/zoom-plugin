@@ -6,6 +6,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.security.Permission;
 import hudson.util.FormValidation;
+import hudson.util.Secret;
 import io.jenkins.plugins.zoom.MessageBuilder;
 import io.jenkins.plugins.zoom.ZoomNotifyClient;
 import jenkins.model.Jenkins;
@@ -26,7 +27,7 @@ public class ZoomSendStep extends Step {
     @DataBoundSetter
     private String webhookUrl;
     @DataBoundSetter
-    private String authToken;
+    private Secret authToken;
     @DataBoundSetter
     private boolean jenkinsProxyUsed;
     @DataBoundSetter

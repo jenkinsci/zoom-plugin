@@ -1,6 +1,7 @@
 package io.jenkins.plugins.zoom;
 
 import hudson.ProxyConfiguration;
+import hudson.util.Secret;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.http.HttpEntity;
@@ -30,6 +31,10 @@ public class ZoomNotifyClient{
 
     private static CloseableHttpClient defaultHttpClient = HttpClients.createDefault();
 
+    public static boolean notify(String url, Secret authToken, boolean jenkinsProxyUsed, String message) {
+        return notify(url, authToken == null ? null : authToken.getPlainText(), jenkinsProxyUsed, message);
+    }
+
     public static boolean notify(String url, String authToken, boolean jenkinsProxyUsed, String message) {
         boolean success = false;
         log.info("Send notification to {}, message: {}", url, message);
@@ -54,7 +59,7 @@ public class ZoomNotifyClient{
             log.error("Invalid URL: {}", url);
         } catch (IOException e2) {
             log.error("Error posting to Zoom, url: {}, message: {}", url, message);
-        } 
+        }
         log.info("Notify success? {}", success);
         return success;
     }
