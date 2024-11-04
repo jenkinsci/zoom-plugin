@@ -4,7 +4,6 @@ import hudson.ProxyConfiguration;
 import hudson.util.Secret;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
@@ -18,7 +17,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
-import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -47,18 +45,14 @@ public class ZoomNotifyClient{
                     ? notifyWithProxy(url, authToken, message)
                     : notifyNoProxy(url, authToken, message);
             int responseCode = response.getStatusLine().getStatusCode();
-            HttpEntity entity = response.getEntity();
             log.info("Response code: {}", responseCode);
-            if (entity != null) {
-                log.info("Response entity: {}", EntityUtils.toString(entity));
-            }
             if(responseCode == HttpStatus.SC_OK){
                 success = true;
             }
         } catch (IllegalArgumentException e1){
             log.error("Invalid URL: {}", url);
         } catch (IOException e2) {
-            log.error("Error posting to Zoom, url: {}, message: {}", url, message);
+            log.error("Error posting to Zoom, url: {}, message: {}", url, message, e2);
         }
         log.info("Notify success? {}", success);
         return success;
