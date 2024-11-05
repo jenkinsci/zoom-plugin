@@ -3,7 +3,6 @@ package io.jenkins.plugins.zoom;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.model.*;
-import hudson.model.Messages;
 import hudson.scm.ChangeLogSet;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
@@ -20,6 +19,8 @@ import java.util.regex.Pattern;
 @Slf4j
 public class MessageBuilder {
 
+    private static final String STATUS_BACK_TO_NORMAL = "Back to normal";
+    private static final String STATUS_STABLE = "Stable";
     private static final Pattern aTag = Pattern.compile("(?i)<a([^>]+)>(.+?)</a>|(\\{)");
     private static final Pattern href = Pattern.compile("\\s*(?i)href\\s*=\\s*(\"([^\"]*\")|'[^']*'|([^'\">\\s]+))");
     public static final String STATUS_MESSAGE_START = "Start";
@@ -122,11 +123,12 @@ public class MessageBuilder {
         }
     }
 
-    private void appendBuildSummary(){
-        if(Messages.Run_Summary_BackToNormal().equals(run.getBuildStatusSummary().message) && !this.notifier.isNotifyBackToNormal()){
-            report.setSummary(this.escape(Messages.Run_Summary_Stable()));
+    private void appendBuildSummary() {
+        String buildStatus = run.getBuildStatusSummary().message;
+        if (STATUS_BACK_TO_NORMAL.equals(buildStatus) && !this.notifier.isNotifyBackToNormal()) {
+            report.setSummary(this.escape(STATUS_STABLE));
         } else {
-            report.setSummary(this.escape(run.getBuildStatusSummary().message));
+            report.setSummary(this.escape(buildStatus));
         }
     }
 

@@ -11,7 +11,6 @@ import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -19,39 +18,23 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
-@Data
 @Slf4j
 public class ZoomNotifier extends Notifier {
 
-    @DataBoundSetter
     private String webhookUrl;
-    @DataBoundSetter
     private Secret authToken;
-    @DataBoundSetter
     private boolean jenkinsProxyUsed;
-    @DataBoundSetter
     private boolean notifyStart;
-    @DataBoundSetter
     private boolean notifySuccess;
-    @DataBoundSetter
     private boolean notifyAborted;
-    @DataBoundSetter
     private boolean notifyNotBuilt;
-    @DataBoundSetter
     private boolean notifyUnstable;
-    @DataBoundSetter
     private boolean notifyFailure;
-    @DataBoundSetter
     private boolean notifyRegression;
-    @DataBoundSetter
     private boolean notifyBackToNormal;
-    @DataBoundSetter
     private boolean notifyRepeatedFailure;
-    @DataBoundSetter
     private boolean includeCommitInfo;
-    @DataBoundSetter
     private boolean includeTestSummary;
-    @DataBoundSetter
     private boolean includeFailedTests;
 
     @DataBoundConstructor
@@ -165,5 +148,142 @@ public class ZoomNotifier extends Notifier {
 //            return FormValidation.ok();
 //        }
 
+    }
+
+
+    public String getWebhookUrl() {
+        return webhookUrl;
+    }
+
+    public Secret getAuthToken() {
+        return authToken;
+    }
+
+    public boolean isJenkinsProxyUsed() {
+        return jenkinsProxyUsed;
+    }
+
+    public boolean isNotifyStart() {
+        return notifyStart;
+    }
+
+    public boolean isNotifySuccess() {
+        return notifySuccess;
+    }
+
+    public boolean isNotifyAborted() {
+        return notifyAborted;
+    }
+
+    public boolean isNotifyNotBuilt() {
+        return notifyNotBuilt;
+    }
+
+    public boolean isNotifyUnstable() {
+        return notifyUnstable;
+    }
+
+    public boolean isNotifyFailure() {
+        return notifyFailure;
+    }
+
+    public boolean isNotifyRegression() {
+        return notifyRegression;
+    }
+
+    public boolean isNotifyBackToNormal() {
+        return notifyBackToNormal;
+    }
+
+    public boolean isNotifyRepeatedFailure() {
+        return notifyRepeatedFailure;
+    }
+
+    public boolean isIncludeCommitInfo() {
+        return includeCommitInfo;
+    }
+
+    public boolean isIncludeTestSummary() {
+        return includeTestSummary;
+    }
+
+    public boolean isIncludeFailedTests() {
+        return includeFailedTests;
+    }
+
+
+    @DataBoundSetter
+    public void setWebhookUrl(String webhookUrl) {
+        this.webhookUrl = webhookUrl;
+    }
+
+    @DataBoundSetter
+    public void setAuthToken(Secret authToken) {
+        this.authToken = authToken;
+    }
+
+    @DataBoundSetter
+    public void setJenkinsProxyUsed(boolean jenkinsProxyUsed) {
+        this.jenkinsProxyUsed = jenkinsProxyUsed;
+    }
+
+    @DataBoundSetter
+    public void setNotifyStart(boolean notifyStart) {
+        this.notifyStart = notifyStart;
+    }
+
+    @DataBoundSetter
+    public void setNotifySuccess(boolean notifySuccess) {
+        this.notifySuccess = notifySuccess;
+    }
+
+    @DataBoundSetter
+    public void setNotifyAborted(boolean notifyAborted) {
+        this.notifyAborted = notifyAborted;
+    }
+
+    @DataBoundSetter
+    public void setNotifyNotBuilt(boolean notifyNotBuilt) {
+        this.notifyNotBuilt = notifyNotBuilt;
+    }
+
+    @DataBoundSetter
+    public void setNotifyUnstable(boolean notifyUnstable) {
+        this.notifyUnstable = notifyUnstable;
+    }
+
+    @DataBoundSetter
+    public void setNotifyFailure(boolean notifyFailure) {
+        this.notifyFailure = notifyFailure;
+    }
+
+    @DataBoundSetter
+    public void setNotifyRegression(boolean notifyRegression) {
+        this.notifyRegression = notifyRegression;
+    }
+
+    @DataBoundSetter
+    public void setNotifyBackToNormal(boolean notifyBackToNormal) {
+        this.notifyBackToNormal = notifyBackToNormal;
+    }
+
+    @DataBoundSetter
+    public void setNotifyRepeatedFailure(boolean notifyRepeatedFailure) {
+        this.notifyRepeatedFailure = notifyRepeatedFailure;
+    }
+
+    @DataBoundSetter
+    public void setIncludeCommitInfo(boolean includeCommitInfo) {
+        this.includeCommitInfo = includeCommitInfo;
+    }
+
+    @DataBoundSetter
+    public void setIncludeTestSummary(boolean includeTestSummary) {
+        this.includeTestSummary = includeTestSummary;
+    }
+
+    @DataBoundSetter
+    public void setIncludeFailedTests(boolean includeFailedTests) {
+        this.includeFailedTests = includeFailedTests;
     }
 }

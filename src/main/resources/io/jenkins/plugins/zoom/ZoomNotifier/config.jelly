@@ -4,7 +4,7 @@
         <f:textbox field="webhookUrl" />
     </f:entry>
     <f:entry title="Token" help="/plugin/zoom/token.html">
-        <f:textbox field="authToken" />
+        <f:password field="authToken" />
     </f:entry>
     <f:entry field="jenkinsProxyUsed" title="Use Jenkins proxy settings" help="/plugin/zoom/jenkinsProxy.html">
         <f:checkbox default="true" />

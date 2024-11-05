@@ -10,7 +10,7 @@ import hudson.util.Secret;
 import io.jenkins.plugins.zoom.MessageBuilder;
 import io.jenkins.plugins.zoom.ZoomNotifyClient;
 import jenkins.model.Jenkins;
-import lombok.Data;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -18,19 +18,14 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
 
-import javax.annotation.Nonnull;
 import java.util.Set;
 
-@Data
 @Slf4j
 public class ZoomSendStep extends Step {
-    @DataBoundSetter
+
     private String webhookUrl;
-    @DataBoundSetter
     private Secret authToken;
-    @DataBoundSetter
     private boolean jenkinsProxyUsed;
-    @DataBoundSetter
     private String message;
 
     @DataBoundConstructor
@@ -48,7 +43,7 @@ public class ZoomSendStep extends Step {
         private static final long serialVersionUID = 1L;
         private transient final ZoomSendStep step;
 
-        protected ZoomSendStepExecution(ZoomSendStep step, @Nonnull StepContext context) {
+        protected ZoomSendStepExecution(ZoomSendStep step, @NonNull StepContext context) {
             super(context);
             this.step = step;
         }
@@ -94,5 +89,41 @@ public class ZoomSendStep extends Step {
             }
             return FormValidation.error("Connect failed");
         }
+    }
+
+    public String getWebhookUrl() {
+        return webhookUrl;
+    }
+
+    @DataBoundSetter
+    public void setWebhookUrl(String webhookUrl) {
+        this.webhookUrl = webhookUrl;
+    }
+
+    public Secret getAuthToken() {
+        return authToken;
+    }
+
+    @DataBoundSetter
+    public void setAuthToken(Secret authToken) {
+        this.authToken = authToken;
+    }
+
+    public boolean isJenkinsProxyUsed() {
+        return jenkinsProxyUsed;
+    }
+
+    @DataBoundSetter
+    public void setJenkinsProxyUsed(boolean jenkinsProxyUsed) {
+        this.jenkinsProxyUsed = jenkinsProxyUsed;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    @DataBoundSetter
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
