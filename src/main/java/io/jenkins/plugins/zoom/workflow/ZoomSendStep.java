@@ -10,7 +10,6 @@ import hudson.util.Secret;
 import io.jenkins.plugins.zoom.MessageBuilder;
 import io.jenkins.plugins.zoom.ZoomNotifyClient;
 import jenkins.model.Jenkins;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -43,7 +42,7 @@ public class ZoomSendStep extends Step {
         private static final long serialVersionUID = 1L;
         private transient final ZoomSendStep step;
 
-        protected ZoomSendStepExecution(ZoomSendStep step, @NonNull StepContext context) {
+        protected ZoomSendStepExecution(ZoomSendStep step, StepContext context) {
             super(context);
             this.step = step;
         }
@@ -105,8 +104,8 @@ public class ZoomSendStep extends Step {
     }
 
     @DataBoundSetter
-    public void setAuthToken(Secret authToken) {
-        this.authToken = authToken;
+    public void setAuthToken(String authToken) {
+        this.authToken = Secret.fromString(authToken);
     }
 
     public boolean isJenkinsProxyUsed() {
