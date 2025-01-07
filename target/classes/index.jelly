@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+    This plugin allows to post build notifications to a Zoom channel.
+</div>

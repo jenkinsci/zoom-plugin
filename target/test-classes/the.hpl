@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Group-Id: io.jenkins.plugins
+Short-Name: zoom
+Long-Name: Zoom Plugin
+Url: https://wiki.jenkins.io/display/JENKINS/Zoom+Plugin
+Plugin-Version: 1.7-SNAPSHOT (private-80da9285-valentin)
+Hudson-Version: 2.346.3
+Jenkins-Version: 2.346.3
+Plugin-Dependencies: workflow-step-api:639.v6eca_cd8c04a_a_,credentials:
+ 1143.vb_e8b_b_ceee347,display-url-api:2.3.6,junit:1166.va_436e268e972,s
+ tructs:324.va_f5d6774f3a_d
+Plugin-Developers: Lukas Lu:zoom us:lukas.lu@zoom.us
+Plugin-License-Name: MIT License
+Plugin-License-Url: https://opensource.org/licenses/MIT
+Plugin-ScmUrl: https://github.com/jenkinsci/zoom-plugin
+Libraries: /home/valentin/.cache/jenkins-plugin-modernizer-cli/zoom/sour
+ ces/src/main/resources,/home/valentin/.cache/jenkins-plugin-modernizer-
+ cli/zoom/sources/target/classes,/home/valentin/.m2/repository/org/apach
+ e/httpcomponents/client5/httpclient5/5.2.1/httpclient5-5.2.1.jar,/home/
+ valentin/.m2/repository/org/apache/httpcomponents/core5/httpcore5-h2/5.
+ 2/httpcore5-h2-5.2.jar,/home/valentin/.m2/repository/org/apache/httpcom
+ ponents/core5/httpcore5/5.2/httpcore5-5.2.jar,/home/valentin/.m2/reposi
+ tory/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar
+Resource-Path: /home/valentin/.cache/jenkins-plugin-modernizer-cli/zoom/
+ sources/src/main/webapp
+

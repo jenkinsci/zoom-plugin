@@ -1,0 +1,7 @@
+/home/valentin/.cache/jenkins-plugin-modernizer-cli/zoom/sources/src/main/java/io/jenkins/plugins/zoom/ZoomNotifier.java
+/home/valentin/.cache/jenkins-plugin-modernizer-cli/zoom/sources/src/main/java/io/jenkins/plugins/zoom/workflow/ZoomSendStep.java
+/home/valentin/.cache/jenkins-plugin-modernizer-cli/zoom/sources/src/main/java/io/jenkins/plugins/zoom/ZoomNotifyClient.java
+/home/valentin/.cache/jenkins-plugin-modernizer-cli/zoom/sources/src/main/java/io/jenkins/plugins/zoom/NotifyClient.java
+/home/valentin/.cache/jenkins-plugin-modernizer-cli/zoom/sources/src/main/java/io/jenkins/plugins/zoom/model/BuildReport.java
+/home/valentin/.cache/jenkins-plugin-modernizer-cli/zoom/sources/src/main/java/io/jenkins/plugins/zoom/MessageBuilder.java
+/home/valentin/.cache/jenkins-plugin-modernizer-cli/zoom/sources/target/generated-sources/localizer/io/jenkins/plugins/zoom/Messages.java
