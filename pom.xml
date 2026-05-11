@@ -18,7 +18,7 @@
   <packaging>hpi</packaging>
   <name>Zoom Plugin</name>
   <description>Send build notification to Zoom channel</description>
-  <url>https://wiki.jenkins.io/display/JENKINS/Zoom+Plugin</url>
+  <url>https://github.com/${gitHubRepo}</url>
 
   <!-- License Information -->
   <licenses>
