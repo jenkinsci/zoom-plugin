@@ -14,7 +14,7 @@
   <!-- Project Information -->
   <groupId>io.jenkins.plugins</groupId>
   <artifactId>zoom</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>${changelist}</version>
   <packaging>hpi</packaging>
   <name>Zoom Plugin</name>
   <description>Send build notification to Zoom channel</description>
@@ -38,8 +38,7 @@
 
   <!-- Project Properties -->
   <properties>
-    <revision>1.7</revision>
-    <changelist>-SNAPSHOT</changelist>
+    <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/zoom-plugin</gitHubRepo>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.492</jenkins.baseline>
