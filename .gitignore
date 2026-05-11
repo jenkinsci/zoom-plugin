@@ -1,0 +1,23 @@
+target/
+work/
+.vs/
+.vscode/
+
+.project
+.classpath
+.settings/
+
+# Vim
+*.swp
+Session.vim
+
+# Exhuberant ctags
+tags
+
+# emacs files
+*~
+/nbproject/
+/TAGS
+
+# Mac OSX
+.DS_Store
