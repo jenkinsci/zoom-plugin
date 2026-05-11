@@ -2,6 +2,17 @@ package io.jenkins.plugins.zoom;
 
 import hudson.ProxyConfiguration;
 import hudson.util.Secret;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
+import javax.net.ssl.SSLContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
@@ -28,18 +39,6 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.util.Timeout;
-
-import javax.net.ssl.SSLContext;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Pattern;
 
 /**
  * Client for sending notifications to Zoom webhook endpoints.
@@ -107,9 +106,8 @@ public class ZoomNotifyClient {
             log.error("Invalid URL provided: {}", url);
             return false;
         }
-        try (CloseableHttpResponse response = jenkinsProxyUsed
-                ? notifyWithProxy(url, authToken, message)
-                : notifyNoProxy(url, authToken, message)) {
+        try (CloseableHttpResponse response =
+                jenkinsProxyUsed ? notifyWithProxy(url, authToken, message) : notifyNoProxy(url, authToken, message)) {
             if (response == null) {
                 log.error("Received null response from server");
                 return false;
@@ -129,7 +127,8 @@ public class ZoomNotifyClient {
     /**
      * Sends notification using proxy configuration
      */
-    private static CloseableHttpResponse notifyWithProxy(String url, String authToken, String message) throws IOException {
+    private static CloseableHttpResponse notifyWithProxy(String url, String authToken, String message)
+            throws IOException {
         ProxyConfiguration proxyConfig = getProxyConfiguration();
         if (!isProxyConfigValid(proxyConfig) || isNoProxyHost(url, proxyConfig.getNoProxyHostPatterns())) {
             log.info("Using direct connection - proxy not applicable for URL: {}", url);
@@ -172,7 +171,8 @@ public class ZoomNotifyClient {
             BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
             credsProvider.setCredentials(
                     new AuthScope(proxyHost),
-                    new UsernamePasswordCredentials(username, proxyConfig.getPassword().toCharArray()));
+                    new UsernamePasswordCredentials(
+                            username, proxyConfig.getPassword().toCharArray()));
             builder.setDefaultCredentialsProvider(credsProvider);
             log.debug("Proxy authentication configured");
         }
@@ -182,7 +182,8 @@ public class ZoomNotifyClient {
     /**
      * Sends notification without proxy
      */
-    private static CloseableHttpResponse notifyNoProxy(String url, String authToken, String message) throws IOException {
+    private static CloseableHttpResponse notifyNoProxy(String url, String authToken, String message)
+            throws IOException {
         log.debug("Sending notification without proxy");
         return doPost(DEFAULT_HTTP_CLIENT, url, authToken, message);
     }
@@ -190,7 +191,8 @@ public class ZoomNotifyClient {
     /**
      * Executes HTTP POST request
      */
-    private static CloseableHttpResponse doPost(CloseableHttpClient httpClient, String url, String authToken, String message) throws IOException {
+    private static CloseableHttpResponse doPost(
+            CloseableHttpClient httpClient, String url, String authToken, String message) throws IOException {
         Objects.requireNonNull(httpClient, "HTTP client must not be null");
         Objects.requireNonNull(url, "URL must not be null");
         HttpPost httpPost = new HttpPost(url);
@@ -233,7 +235,8 @@ public class ZoomNotifyClient {
         }
         try {
             String host = new URL(url).getHost();
-            return noProxyHostPatterns.stream().anyMatch(pattern -> pattern.matcher(host).matches());
+            return noProxyHostPatterns.stream()
+                    .anyMatch(pattern -> pattern.matcher(host).matches());
         } catch (MalformedURLException e) {
             log.error("Invalid URL: {}", url, e);
             return false;

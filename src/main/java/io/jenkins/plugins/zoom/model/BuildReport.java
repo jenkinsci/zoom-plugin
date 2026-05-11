@@ -2,56 +2,58 @@ package io.jenkins.plugins.zoom.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hudson.scm.ChangeLogSet;
-import lombok.Data;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Data;
+import org.apache.commons.lang.StringUtils;
 
 @Data
 public class BuildReport {
     private String name;
     private String number;
+
     @JsonProperty("full_url")
     private String fullUrl;
+
     private long duration;
     private String status;
     private String summary;
     private String cause;
     private Set<Change> changes;
+
     @JsonProperty("test_summary")
     private TestSummary testSummary = new TestSummary();
 
-    public void addChange(ChangeLogSet.Entry entry){
+    public void addChange(ChangeLogSet.Entry entry) {
         Change c = new Change();
         c.setAuthor(entry.getAuthor().getDisplayName());
         c.setCommitId(entry.getCommitId());
         c.setMessage(entry.getMsgEscaped());
-        for(ChangeLogSet.AffectedFile file: entry.getAffectedFiles()){
+        for (ChangeLogSet.AffectedFile file : entry.getAffectedFiles()) {
             c.addAffectedFile(file);
         }
         changes.add(c);
     }
 
-    public void initChanges(){
+    public void initChanges() {
         changes = new HashSet<>();
     }
 
-    public void initTestSummary(){
+    public void initTestSummary() {
         this.testSummary.setTotal(0);
         this.testSummary.setFail(0);
         this.testSummary.setSkip(0);
     }
 
-    public void setTotalTest(int count){
+    public void setTotalTest(int count) {
         this.testSummary.setTotal(count);
     }
 
-    public void setFailTest(int count){
+    public void setFailTest(int count) {
         this.testSummary.setFail(count);
     }
 
-    public void setSkipTest(int count){
+    public void setSkipTest(int count) {
         this.testSummary.setSkip(count);
     }
 
@@ -62,7 +64,7 @@ public class BuildReport {
         private String commitId;
         private Set<AffectedFile> files = new HashSet<>();
 
-        public void addAffectedFile(ChangeLogSet.AffectedFile file){
+        public void addAffectedFile(ChangeLogSet.AffectedFile file) {
             AffectedFile f = new AffectedFile();
             f.setName(file.getPath());
             files.add(f);
@@ -81,11 +83,11 @@ public class BuildReport {
         private Integer skip;
         private Set<TestResult> failedResults;
 
-        public void initFailedResults(){
+        public void initFailedResults() {
             failedResults = new HashSet<>();
         }
 
-        public void addFailedTestResults(hudson.tasks.test.TestResult result){
+        public void addFailedTestResults(hudson.tasks.test.TestResult result) {
             TestResult r = new TestResult();
             r.setName(getTestClassAndMethod(result));
             r.setDuration(String.valueOf(result.getDuration()));

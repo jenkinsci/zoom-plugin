@@ -7,14 +7,13 @@ import hudson.scm.ChangeLogSet;
 import hudson.tasks.test.AbstractTestResultAction;
 import hudson.tasks.test.TestResult;
 import io.jenkins.plugins.zoom.model.BuildReport;
-import lombok.extern.slf4j.Slf4j;
-import org.jenkinsci.plugins.displayurlapi.DisplayURLProvider;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.extern.slf4j.Slf4j;
+import org.jenkinsci.plugins.displayurlapi.DisplayURLProvider;
 
 @Slf4j
 public class MessageBuilder {
@@ -40,7 +39,7 @@ public class MessageBuilder {
         this.report = new BuildReport();
     }
 
-    public String buildPipeMsg(String message){
+    public String buildPipeMsg(String message) {
         appendStatus(STATUS_MESSAGE_WORKFLOW);
         appendFullDisplayName();
         appendDisplayName();
@@ -55,13 +54,13 @@ public class MessageBuilder {
         return null;
     }
 
-    public String prebuild(){
+    public String prebuild() {
         appendStatus(STATUS_MESSAGE_START);
         appendFullDisplayName();
         appendDisplayName();
         appendOpenLink();
         appendCause();
-        if(notifier.isIncludeCommitInfo()){
+        if (notifier.isIncludeCommitInfo()) {
             appendChanges();
         }
         try {
@@ -73,7 +72,7 @@ public class MessageBuilder {
         return null;
     }
 
-    public String build(){
+    public String build() {
         appendFullDisplayName();
         appendDisplayName();
         appendOpenLink();
@@ -81,10 +80,10 @@ public class MessageBuilder {
         appendDuration();
         appendStatus(getBuildResult());
         appendBuildSummary();
-        if(notifier.isIncludeTestSummary()){
+        if (notifier.isIncludeTestSummary()) {
             appendTestSummary();
         }
-        if(notifier.isIncludeFailedTests()){
+        if (notifier.isIncludeFailedTests()) {
             appendFailedTests();
         }
         try {
@@ -96,29 +95,28 @@ public class MessageBuilder {
         return null;
     }
 
-    private void appendFullDisplayName(){
+    private void appendFullDisplayName() {
         report.setName(this.escape(run.getFullDisplayName()));
     }
 
-    private void appendDisplayName(){
+    private void appendDisplayName() {
         report.setNumber(this.escape(run.getDisplayName()));
     }
 
-    private void appendOpenLink(){
+    private void appendOpenLink() {
         String url = DisplayURLProvider.get().getRunURL(run);
         report.setFullUrl(this.escape(url));
     }
 
-
-    private void appendStatus(String status){
+    private void appendStatus(String status) {
         report.setStatus(status);
     }
 
-    private String getBuildResult(){
+    private String getBuildResult() {
         ResultTrend trend = ResultTrend.getResultTrend(this.run);
-        if(trend == ResultTrend.SUCCESS || trend == ResultTrend.FIXED){
+        if (trend == ResultTrend.SUCCESS || trend == ResultTrend.FIXED) {
             return STATUS_MESSAGE_SUCCESS;
-        }else{
+        } else {
             return STATUS_MESSAGE_FAILURE;
         }
     }
@@ -132,38 +130,37 @@ public class MessageBuilder {
         }
     }
 
-    private void appendCause(){
+    private void appendCause() {
         CauseAction causeAction = run.getAction(CauseAction.class);
-        if (causeAction != null){
+        if (causeAction != null) {
             report.setCause(this.escape(causeAction.getCauses().get(0).getShortDescription()));
         }
     }
 
-    private void appendDuration(){
+    private void appendDuration() {
         report.setDuration(run.getDuration());
     }
 
-    private void appendChanges(){
+    private void appendChanges() {
         report.initChanges();
-        if(this.run instanceof AbstractBuild){
+        if (this.run instanceof AbstractBuild) {
             AbstractBuild build = (AbstractBuild) run;
             ChangeLogSet changeSet = build.getChangeSet();
-            if (!build.hasChangeSetComputed() || changeSet == null || changeSet.getItems().length == 0){
+            if (!build.hasChangeSetComputed() || changeSet == null || changeSet.getItems().length == 0) {
                 listener.getLogger().println("No commit changes");
                 log.info("No commit changes");
                 return;
             }
-            for (Object o : changeSet.getItems()){
+            for (Object o : changeSet.getItems()) {
                 ChangeLogSet.Entry entry = (ChangeLogSet.Entry) o;
                 report.addChange(entry);
             }
         }
     }
 
-    private void appendTestSummary(){
+    private void appendTestSummary() {
         report.initTestSummary();
-        AbstractTestResultAction<?> action = this.run
-                .getAction(AbstractTestResultAction.class);
+        AbstractTestResultAction<?> action = this.run.getAction(AbstractTestResultAction.class);
         if (action != null) {
             report.setTotalTest(action.getTotalCount());
             report.setFailTest(action.getFailCount());
@@ -174,12 +171,11 @@ public class MessageBuilder {
         }
     }
 
-    private void appendFailedTests(){
+    private void appendFailedTests() {
         report.getTestSummary().initFailedResults();
-        AbstractTestResultAction<?> action = this.run
-                .getAction(AbstractTestResultAction.class);
+        AbstractTestResultAction<?> action = this.run.getAction(AbstractTestResultAction.class);
         if (action != null && action.getFailCount() > 0) {
-            for(TestResult result : action.getFailedTests()){
+            for (TestResult result : action.getFailedTests()) {
                 report.getTestSummary().addFailedTestResults(result);
             }
         } else {
@@ -187,7 +183,6 @@ public class MessageBuilder {
             log.info("No failed tests");
         }
     }
-
 
     private String[] extractReplaceLinks(Matcher aTag, StringBuffer sb) {
         int size = 0;
@@ -197,10 +192,10 @@ public class MessageBuilder {
             if (url.find()) {
                 String escapeThis = aTag.group(3);
                 if (escapeThis != null) {
-                    aTag.appendReplacement(sb,String.format("{%s}", size++));
+                    aTag.appendReplacement(sb, String.format("{%s}", size++));
                     links.add("{");
                 } else {
-                    aTag.appendReplacement(sb,String.format("{%s}", size++));
+                    aTag.appendReplacement(sb, String.format("{%s}", size++));
                     links.add(String.format("<%s|%s>", url.group(1).replaceAll("\"", ""), aTag.group(2)));
                 }
             }

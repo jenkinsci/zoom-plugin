@@ -38,9 +38,7 @@ public class ZoomNotifier extends Notifier {
     private boolean includeFailedTests;
 
     @DataBoundConstructor
-    public ZoomNotifier() {
-
-    }
+    public ZoomNotifier() {}
 
     @Override
     public DescriptorImpl getDescriptor() {
@@ -48,22 +46,21 @@ public class ZoomNotifier extends Notifier {
     }
 
     @Override
-    public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener){
+    public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
         log.info("Prebuild: {}", build.getProject().getFullDisplayName());
         listener.getLogger().println("---------------------- Prebuild ----------------------");
-        if(notifyStart){
+        if (notifyStart) {
             MessageBuilder messageBuilder = new MessageBuilder(this, build, listener);
             ZoomNotifyClient.notify(this.webhookUrl, this.authToken, this.jenkinsProxyUsed, messageBuilder.prebuild());
         }
         return super.prebuild(build, listener);
     }
 
-
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) {
         log.info("Perform: {}", build.getProject().getFullDisplayName());
         listener.getLogger().println("---------------------- Perform ----------------------");
-        if(notifyPerform(build)){
+        if (notifyPerform(build)) {
             MessageBuilder messageBuilder = new MessageBuilder(this, build, listener);
             ZoomNotifyClient.notify(this.webhookUrl, this.authToken, this.jenkinsProxyUsed, messageBuilder.build());
         }
@@ -80,12 +77,12 @@ public class ZoomNotifier extends Notifier {
         return true;
     }
 
-    private boolean notifyPerform(Run run){
-        if(run.isBuilding()){
+    private boolean notifyPerform(Run run) {
+        if (run.isBuilding()) {
             return false;
         }
         ResultTrend trend = ResultTrend.getResultTrend(run);
-        switch(trend) {
+        switch (trend) {
             case ABORTED:
                 return this.isNotifyAborted();
             case NOT_BUILT:
@@ -103,7 +100,7 @@ public class ZoomNotifier extends Notifier {
             case SUCCESS:
                 return this.isNotifySuccess();
             case FIXED:
-                return this.isNotifySuccess()||this.isNotifyBackToNormal();
+                return this.isNotifySuccess() || this.isNotifyBackToNormal();
             default:
                 return false;
         }
@@ -111,7 +108,7 @@ public class ZoomNotifier extends Notifier {
 
     @Symbol("zoomNotifier")
     @Extension
-    public static class DescriptorImpl extends BuildStepDescriptor<Publisher>{
+    public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
@@ -124,32 +121,32 @@ public class ZoomNotifier extends Notifier {
         }
 
         @POST
-        public FormValidation doTestConnection(@QueryParameter("webhookUrl") final String webhookUrl,
-                                               @QueryParameter("authToken") final String authToken,
-                                               @QueryParameter("jenkinsProxyUsed") final boolean jenkinsProxyUsed){
+        public FormValidation doTestConnection(
+                @QueryParameter("webhookUrl") final String webhookUrl,
+                @QueryParameter("authToken") final String authToken,
+                @QueryParameter("jenkinsProxyUsed") final boolean jenkinsProxyUsed) {
             Jenkins.get().checkPermission(Permission.CONFIGURE);
-            if(ZoomNotifyClient.notify(webhookUrl, authToken, jenkinsProxyUsed, null)){
+            if (ZoomNotifyClient.notify(webhookUrl, authToken, jenkinsProxyUsed, null)) {
                 return FormValidation.ok("Connection is ok");
             }
             return FormValidation.error("Connect failed");
         }
 
-//        public FormValidation doCheckWebhookUrl(@QueryParameter String value) {
-//            if (Util.fixEmptyAndTrim(value) == null) {
-//                return FormValidation.error("URL cannot be empty");
-//            }
-//            return FormValidation.ok();
-//        }
-//
-//        public FormValidation doCheckAuthToken(@QueryParameter String value) {
-//            if (Util.fixEmptyAndTrim(value) == null) {
-//                return FormValidation.error("Token cannot be empty");
-//            }
-//            return FormValidation.ok();
-//        }
+        //        public FormValidation doCheckWebhookUrl(@QueryParameter String value) {
+        //            if (Util.fixEmptyAndTrim(value) == null) {
+        //                return FormValidation.error("URL cannot be empty");
+        //            }
+        //            return FormValidation.ok();
+        //        }
+        //
+        //        public FormValidation doCheckAuthToken(@QueryParameter String value) {
+        //            if (Util.fixEmptyAndTrim(value) == null) {
+        //                return FormValidation.error("Token cannot be empty");
+        //            }
+        //            return FormValidation.ok();
+        //        }
 
     }
-
 
     public String getWebhookUrl() {
         return webhookUrl;
@@ -210,7 +207,6 @@ public class ZoomNotifier extends Notifier {
     public boolean isIncludeFailedTests() {
         return includeFailedTests;
     }
-
 
     @DataBoundSetter
     public void setWebhookUrl(String webhookUrl) {

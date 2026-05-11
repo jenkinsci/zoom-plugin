@@ -9,6 +9,7 @@ import hudson.util.FormValidation;
 import hudson.util.Secret;
 import io.jenkins.plugins.zoom.MessageBuilder;
 import io.jenkins.plugins.zoom.ZoomNotifyClient;
+import java.util.Set;
 import jenkins.model.Jenkins;
 import lombok.extern.slf4j.Slf4j;
 import org.jenkinsci.plugins.workflow.steps.*;
@@ -16,8 +17,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.verb.POST;
-
-import java.util.Set;
 
 @Slf4j
 public class ZoomSendStep extends Step {
@@ -28,26 +27,24 @@ public class ZoomSendStep extends Step {
     private String message;
 
     @DataBoundConstructor
-    public ZoomSendStep() {
-    }
+    public ZoomSendStep() {}
 
     @Override
     public StepExecution start(StepContext stepContext) throws Exception {
         return new ZoomSendStepExecution(this, stepContext);
     }
 
-
     private static class ZoomSendStepExecution extends SynchronousNonBlockingStepExecution {
 
         private static final long serialVersionUID = 1L;
-        private transient final ZoomSendStep step;
+        private final transient ZoomSendStep step;
 
         protected ZoomSendStepExecution(ZoomSendStep step, StepContext context) {
             super(context);
             this.step = step;
         }
 
-        //do the work of the step
+        // do the work of the step
         @Override
         protected Object run() throws Exception {
             Run run = getContext().get(Run.class);
@@ -55,7 +52,8 @@ public class ZoomSendStep extends Step {
             TaskListener listener = getContext().get(TaskListener.class);
             MessageBuilder messageBuilder = new MessageBuilder(null, run, listener);
             String msg = messageBuilder.buildPipeMsg(this.step.getMessage());
-            ZoomNotifyClient.notify(this.step.getWebhookUrl(), this.step.getAuthToken(), this.step.isJenkinsProxyUsed(), msg);
+            ZoomNotifyClient.notify(
+                    this.step.getWebhookUrl(), this.step.getAuthToken(), this.step.isJenkinsProxyUsed(), msg);
             return null;
         }
     }
@@ -79,11 +77,12 @@ public class ZoomSendStep extends Step {
         }
 
         @POST
-        public FormValidation doTestConnection(@QueryParameter("webhookUrl") final String webhookUrl,
-                                               @QueryParameter("authToken") final String authToken,
-                                               @QueryParameter("jenkinsProxyUsed") final boolean jenkinsProxyUsed){
+        public FormValidation doTestConnection(
+                @QueryParameter("webhookUrl") final String webhookUrl,
+                @QueryParameter("authToken") final String authToken,
+                @QueryParameter("jenkinsProxyUsed") final boolean jenkinsProxyUsed) {
             Jenkins.get().checkPermission(Permission.CONFIGURE);
-            if(ZoomNotifyClient.notify(webhookUrl, authToken, jenkinsProxyUsed, null)){
+            if (ZoomNotifyClient.notify(webhookUrl, authToken, jenkinsProxyUsed, null)) {
                 return FormValidation.ok("Connection is ok");
             }
             return FormValidation.error("Connect failed");
