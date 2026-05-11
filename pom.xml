@@ -51,6 +51,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
     <spotless.check.skip>false</spotless.check.skip>
+    <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
   </properties>
   <dependencyManagement>
     <dependencies>
