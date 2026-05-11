@@ -38,7 +38,7 @@
 
   <!-- Project Properties -->
   <properties>
-        <changelist>999999-SNAPSHOT</changelist>
+    <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/zoom-plugin</gitHubRepo>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.492</jenkins.baseline>
