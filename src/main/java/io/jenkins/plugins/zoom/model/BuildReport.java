@@ -5,7 +5,6 @@ import hudson.scm.ChangeLogSet;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
-import org.apache.commons.lang.StringUtils;
 
 @Data
 public class BuildReport {
@@ -104,7 +103,7 @@ public class BuildReport {
     private static String getTestClassAndMethod(hudson.tasks.test.TestResult result) {
         String fullDisplayName = result.getFullDisplayName();
 
-        if (StringUtils.countMatches(fullDisplayName, ".") > 1) {
+        if (fullDisplayName.chars().filter(c -> c == '.').count() > 1) {
             int methodDotIndex = fullDisplayName.lastIndexOf('.');
             int testClassDotIndex = fullDisplayName.substring(0, methodDotIndex).lastIndexOf('.');
 
